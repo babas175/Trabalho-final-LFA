@@ -41,9 +41,13 @@ class Transicao:
         self.estado_destino = estado_destino
 
 class Estado:
-    def __init__(self, nome, transicoes):
+    def __init__(self, nome, transicoes=None):
         self.nome = nome
-        self.transicoes = transicoes
+        self.transicoes = transicoes if transicoes is not None else []
+
+    def adicionar_transicao(self, simbolo, proximo_estado):
+        self.transicoes.append((simbolo, proximo_estado))
+
 
 
 
@@ -58,7 +62,6 @@ def verificar_similaridade_estados(estado1, estado2, afd):
     return True
 
 # Função para minimizar o AFD
-
 def minimizar_afd(afd):
     # Criação da tabela de marcação
     tabela = [[False] * len(afd.estados) for _ in range(len(afd.estados))]
@@ -134,14 +137,17 @@ def minimizar_afd(afd):
             estado_inicial_afd_min = estado_nome
 
         if any(estado in afd.estados_finais for estado in particao):
-                        estados_finais_afd_min.append(estado_nome)
+            estados_finais_afd_min.append(estado_nome)
 
     # Adicionar estados ao AFD mínimo
     for estado_nome in estados_afd_min:
         afd_min.adicionar_estado(Estado(estado_nome, []))
 
+    # Adicionar estado de erro
+    estado_erro = Estado("erro")
+    afd_min.adicionar_estado(estado_erro)
 
-    # Definir estado inicial do AFD mínimo
+        # Definir estado inicial do AFD mínimo
     afd_min.definir_estado_inicial(estado_inicial_afd_min)
 
     # Definir estados finais do AFD mínimo
@@ -155,8 +161,33 @@ def minimizar_afd(afd):
             proximo_estado_afd_min = afd.obter_proximo_estado(','.join(particoes[i]), simbolo)
             afd_min.adicionar_transicao(estado_afd_min, simbolo, proximo_estado_afd_min)
 
-    #print(afd_min.estados)
+    # Adicionar transições do estado de erro para si mesmo para cada símbolo do alfabeto
+    for simbolo in afd_min.alfabeto:
+        afd_min.adicionar_transicao("erro", simbolo, "erro")
+
+    return afd_min
+
+def adicionar_estado_erro(afd):
+    # Criar o estado de erro
+    estado_erro = Estado("erro", [])
+
+    # Adicionar transições do estado de erro para si mesmo para cada símbolo do alfabeto
+    for simbolo in afd.alfabeto:
+        estado_erro.adicionar_transicao(simbolo, "erro")
+
+    # Adicionar o estado de erro à lista de estados do AFD
+    afd.adicionar_estado(estado_erro)
+
+    # Atualizar a lista de estados finais, se necessário
+    if estado_erro not in afd.estados_finais:
+        afd.adicionar_estado_final(estado_erro)
+
+        
+        
+        
+        
+        
+ #print(afd_min.estados)
     #print(afd_min.alfabeto)
     #print(afd_min.estado_inicial)
     #print(afd_min.estados_finais)
-    return afd_min

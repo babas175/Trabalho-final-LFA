@@ -72,9 +72,9 @@ def determinizar_afnd(afnd):
                 afnd.adicionar_estado_final(','.join(estado_afd))
                 break
 
-    print(afnd.estados)
-    print(afnd.alfabeto)
-    print(afnd.estado_inicial)
-    print(afnd.estados_finais)
+    #print(afnd.estados)
+    #print(afnd.alfabeto)
+    #print(afnd.estado_inicial)
+    #print(afnd.estados_finais)
 
     return afnd
